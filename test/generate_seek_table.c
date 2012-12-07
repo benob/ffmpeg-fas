@@ -32,7 +32,7 @@
 
 int main (int argc, char **argv)
 {
-  av_log_level = AV_LOG_QUIET;
+  av_log_set_level(AV_LOG_QUIET);
 
   if (argc < 2) {
     fprintf (stderr, "usage: %s <video_file>\n", argv[0]);
@@ -42,7 +42,7 @@ int main (int argc, char **argv)
   av_register_all();
 
   AVFormatContext *pFormatCtx;
-  if (av_open_input_file(&pFormatCtx, argv[1], NULL, 0, NULL) !=0)
+  if (avformat_open_input(&pFormatCtx, argv[1], NULL, NULL) !=0)
     return -1;
 
   if (av_find_stream_info(pFormatCtx)<0)
@@ -52,7 +52,7 @@ int main (int argc, char **argv)
   unsigned int i;
   
   for (i = 0; i < pFormatCtx->nb_streams; i++)
-    if (pFormatCtx->streams[i]->codec->codec_type == CODEC_TYPE_VIDEO)
+    if (pFormatCtx->streams[i]->codec->codec_type == AVMEDIA_TYPE_VIDEO)
       {
 	stream_id = i;
 	break;
@@ -129,7 +129,7 @@ int main (int argc, char **argv)
       if (Packet.stream_index == stream_id)
 	{	  
 	  //	  fprintf(stderr, "Packet: (P%d: %lld %lld %d)\n", count, Packet.pts, Packet.dts, Packet.flags);
-	  if ((Packet.flags & PKT_FLAG_KEY) || is_first_packet )
+	  if ((Packet.flags & AV_PKT_FLAG_KEY) || is_first_packet )
 	    {	      		
 	      /* when keyframes overlap in the stream, that means multiple packets labeled 'keyframe' will arrive before 
 		 the keyframe itself. this results in wrong assignments all around, but only the first one needs to be right.
@@ -152,7 +152,7 @@ int main (int argc, char **argv)
 	      else
 		key_packet_dts = prev_packet_dts;
 
-	      if (Packet.flags & PKT_FLAG_KEY)
+	      if (Packet.flags & AV_PKT_FLAG_KEY)
 		key_packets++;
 	      else
 		non_key_packets++;
@@ -161,13 +161,13 @@ int main (int argc, char **argv)
 	    non_key_packets++;
 
 
-	  avcodec_decode_video(pCodecCtx, pFrame, &frameFinished, Packet.data, Packet.size);
+	  avcodec_decode_video2(pCodecCtx, pFrame, &frameFinished, &Packet);
 
 	  if (frameFinished)
 	    {
 
 	      //	      fprintf(stderr, "Frame : (P%d F%d: %lld %lld L:%d)\n", count, frame_count, Packet.pts, Packet.dts, pFrame->key_frame);
-	      if ((pFrame->key_frame && frames_have_label) || ((Packet.flags & PKT_FLAG_KEY) && !frames_have_label))
+	      if ((pFrame->key_frame && frames_have_label) || ((Packet.flags & AV_PKT_FLAG_KEY) && !frames_have_label))
 		{
 		  key_frames++;
 		  
