@@ -29,6 +29,7 @@
 #define __extern extern
 #endif
 
+#include "ffmscompat.h"
 #include "seek_indices.h"
 
 
