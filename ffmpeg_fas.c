@@ -208,7 +208,7 @@ fas_error_type fas_open_video (fas_context_ref_type *context_ptr, char *file_pat
 
   fas_context->seek_table = seek_init_table (-1); /* default starting size */ 
 
-  if (avformat_open_input ( &(fas_context->format_context), file_path, NULL, NULL ) != 0)
+  if (av_open_input_file ( &(fas_context->format_context), file_path, NULL, 0, NULL ) != 0)
     {
       fas_close_video(fas_context);
       return private_show_error ("failure to open file", FAS_UNSUPPORTED_FORMAT);
