@@ -31,6 +31,8 @@ int main (int argc, char **argv)
           return 1;
       }
 
+      fprintf(stderr, "frame %d\n", fas_get_frame_index(context));
+
       // convert to opencv image format
       cv::Mat opencv_image(image_buffer.height, image_buffer.width, CV_8UC3);
       for(int y=0; y<image_buffer.height; y++) {
