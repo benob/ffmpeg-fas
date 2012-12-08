@@ -21,6 +21,7 @@
 
 #include "libavcodec/avcodec.h"
 #include "libavformat/avformat.h"
+#include "ffmscompat.h"
 #include <stdio.h>
 #include <string.h>
 #include "seek_indices.h"
@@ -42,7 +43,7 @@ int main (int argc, char **argv)
   av_register_all();
 
   AVFormatContext *pFormatCtx;
-  if (av_open_input_file(&pFormatCtx, argv[1], NULL, 0, NULL) !=0)
+  if (avformat_open_input(&pFormatCtx, argv[1], NULL, NULL) !=0)
     return -1;
 
   if (av_find_stream_info(pFormatCtx)<0)

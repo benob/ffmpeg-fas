@@ -35,6 +35,8 @@ int img_convert(AVPicture *dst, int dst_pix_fmt, const AVPicture *src, int src_p
 #include "libswscale/swscale.h"
 #endif /*  _WIN32 && STATIC_DLL */
 
+#include "ffmscompat.h"
+
 #include "seek_indices.h"
 #include "private_errors.h"
 
@@ -208,7 +210,7 @@ fas_error_type fas_open_video (fas_context_ref_type *context_ptr, char *file_pat
 
   fas_context->seek_table = seek_init_table (-1); /* default starting size */ 
 
-  if (av_open_input_file ( &(fas_context->format_context), file_path, NULL, 0, NULL ) != 0)
+  if (avformat_open_input ( &(fas_context->format_context), file_path, NULL, NULL ) != 0)
     {
       fas_close_video(fas_context);
       return private_show_error ("failure to open file", FAS_UNSUPPORTED_FORMAT);
