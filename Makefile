@@ -1,5 +1,5 @@
-CFLAGS=-Wimplicit-function-declaration -I.
-CXXFLAGS=-I. `pkg-config opencv --cflags`
+CFLAGS=-Wimplicit-function-declaration -I. -g
+CXXFLAGS=-I. `pkg-config opencv --cflags` -g
 LDFLAGS+=-lavcodec -lavformat -lavutil -lswscale 
 OBJ+=ffmpeg_fas.o seek_indices.o
 
