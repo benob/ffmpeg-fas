@@ -8,8 +8,9 @@ using seek tables.
 
 It has been built and tested under Linux and Windows.
 
-**NOTE [12/2012]**: 
-Updated to compile with recent ffmpeg
+** NOTES **: 
+02/2013 Added seeking by time
+12/2012 Updated to compile with recent ffmpeg
 *****************
 
 Features:
