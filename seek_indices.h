@@ -54,6 +54,7 @@ typedef enum
 typedef struct
 {
   int     display_index;
+  double  time;
   int64_t first_packet_dts;
   int64_t last_packet_dts;
 } seek_entry_type;
@@ -83,6 +84,7 @@ __extern int             compare_seek_tables(seek_table_type t1, seek_table_type
 __extern seek_error_type seek_append_table_entry (seek_table_type *table, seek_entry_type entry);
 
 __extern seek_error_type seek_get_nearest_entry (seek_table_type *table, seek_entry_type *entry, int display_index, int offset);
+__extern seek_error_type seek_get_nearest_entry_by_time (seek_table_type *table, seek_entry_type *entry, double time, int offset);
 
 __extern seek_error_type seek_show_table (seek_table_type table);          /* human readable */
 __extern seek_error_type seek_show_raw_table (FILE *file, seek_table_type table);

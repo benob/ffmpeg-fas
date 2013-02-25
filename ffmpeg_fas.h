@@ -92,6 +92,7 @@ __extern char*            fas_error_message (fas_error_type error);
 
 __extern fas_boolean_type fas_frame_available (fas_context_ref_type context);
 __extern int              fas_get_frame_index (fas_context_ref_type context);
+__extern double           fas_get_frame_time (fas_context_ref_type context);
 __extern fas_error_type   fas_step_forward    (fas_context_ref_type context);
 
 __extern fas_error_type   fas_get_frame  (fas_context_ref_type context, fas_raw_image_type *image_ptr);
@@ -99,6 +100,9 @@ __extern void             fas_free_frame (fas_raw_image_type image);
 
 __extern fas_error_type   fas_seek_to_nearest_key     (fas_context_ref_type context, int target_index);
 __extern fas_error_type   fas_seek_to_frame           (fas_context_ref_type context, int target_index);
+
+__extern fas_error_type   fas_seek_to_nearest_key_by_time     (fas_context_ref_type context, double time);
+__extern fas_error_type   fas_seek_to_time           (fas_context_ref_type context, double time);
 
 __extern int              fas_get_frame_count         (fas_context_ref_type context);
 __extern int              fas_get_frame_count_fast    (fas_context_ref_type context);

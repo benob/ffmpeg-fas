@@ -61,6 +61,7 @@ int compare_seek_tables(seek_table_type t1, seek_table_type t2)
       //      	     t1.array[i].decode_time, t2.array[i].decode_time,
       //      	     t1.array[i].display_time, t2.array[i].display_time);
       if ((t1.array[i].display_index != t2.array[i].display_index)  ||
+      (t1.array[i].time != t2.array[i].time)  ||
 	  (t1.array[i].last_packet_dts   != t2.array[i].last_packet_dts)    ||
 	  (t1.array[i].first_packet_dts  != t2.array[i].first_packet_dts))
 	return 0;
@@ -202,6 +203,42 @@ seek_error_type seek_get_nearest_entry (seek_table_type *table, seek_entry_type 
   return seek_no_error;
 }
 
+/*
+ * seek_get_nearest_entry_by_time
+ */
+
+seek_error_type seek_get_nearest_entry_by_time (seek_table_type *table, seek_entry_type *entry, double time, int offset)
+{
+  /* using offset>0 returns a modified seek_entry that sets the 'time-to-seek' to be $offset keyframes in the past. 
+   */
+
+  if (NULL == table || NULL == table->array || table->num_entries <= 0) {
+    return private_show_error ("NULL or invalid seek table", seek_bad_argument);
+  }
+
+  if (NULL == entry) {
+    return private_show_error ("NULL entry buffer (for return)", seek_bad_argument);
+  }
+
+  if (time < table->array[0].time)
+    return private_show_error ("tried to seek to frame index before first frame", seek_bad_argument);
+
+  int i;
+  for (i=0; i < table->num_entries; i++)
+    if (table->array[i].time > time)
+      break;
+
+  i = i-1;
+
+  if (i<offset)   /* target was lower than first element (including offset) */
+    return private_show_error ("target index out of table range (too small)", seek_bad_argument);
+  
+  *entry = table->array[i];
+  (*entry).first_packet_dts = table->array[i-offset].first_packet_dts;
+
+  return seek_no_error;
+}
+
 
 /* read raw file */
 seek_table_type read_table_file(char *name)
@@ -225,7 +262,7 @@ seek_table_type read_table_file(char *name)
 
   int i;
   for (i=0;i<ans.num_entries;i++)
-    fscanf(table_file, "%d %lld %lld\n", &(ans.array[i].display_index), &(ans.array[i].first_packet_dts), &(ans.array[i].last_packet_dts));
+    fscanf(table_file, "%d %lf %lld %lld\n", &(ans.array[i].display_index), &(ans.array[i].time), &(ans.array[i].first_packet_dts), &(ans.array[i].last_packet_dts));
 
   fclose(table_file);
   return ans;
@@ -248,7 +285,7 @@ seek_error_type seek_show_raw_table (FILE* file, seek_table_type table)
   {
     entry = &(table.array[index]);
 
-    fprintf (file, "%d %lld %lld\n", entry->display_index, entry->first_packet_dts, entry->last_packet_dts);
+    fprintf (file, "%d %lf %lld %lld\n", entry->display_index, entry->time, entry->first_packet_dts, entry->last_packet_dts);
   }
   return seek_no_error;
 }
@@ -272,7 +309,7 @@ seek_error_type seek_show_table (seek_table_type table)
   {
     entry = &(table.array[index]);
 
-    fprintf (stderr, "  %04d --> %08lld (%08lld)\n", entry->display_index, entry->first_packet_dts, entry->last_packet_dts);
+    fprintf (stderr, "  %04d %lf --> %08lld (%08lld)\n", entry->display_index, entry->time, entry->first_packet_dts, entry->last_packet_dts);
   }
 
   fprintf (stderr, "-----------------------\n");
